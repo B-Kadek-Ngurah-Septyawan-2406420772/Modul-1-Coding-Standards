@@ -25,12 +25,55 @@
       <td th:text="${product.productQuantity}"></td>
       <td>
         <a th:href="@{/product/edit/{productId}(productId=${product.productId})}" class="btn btn-primary btn-sm">Edit</a>
+        <button type="button" class="btn btn-danger btn-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteModal"
+                th:data-product-id="${product.productId}"
+                th:data-product-name="${product.productName}">
+          Delete
+        </button>
       </td>
     </tr>
     </tbody>
   </table>
 </div>
 
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">Delete Product</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete <strong id="deleteProductName"></strong>?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+        <form id="deleteForm" method="post" class="d-inline">
+          <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script>
+  const deleteModal = document.getElementById('deleteModal');
+  if (deleteModal) {
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+      const button = event.relatedTarget;
+      const productId = button.getAttribute('data-product-id');
+      const productName = button.getAttribute('data-product-name');
+      const deleteForm = deleteModal.querySelector('#deleteForm');
+      deleteForm.action = `/product/delete/${productId}`;
+      const deleteProductName = deleteModal.querySelector('#deleteProductName');
+      deleteProductName.textContent = productName || '';
+    });
+  }
+</script>
 </body>
 </html>
