@@ -1,10 +1,43 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
   <title>ADV Shop</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
-  <h3>Welcome</h3>
+<nav class="navbar navbar-expand-lg navbar-dark app-navbar">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/}">ADV Shop</a>
+    <div class="navbar-nav ml-auto">
+      <a class="nav-link" th:href="@{/}">Home</a>
+      <a class="nav-link" th:href="@{/product/list}">Products</a>
+      <a class="nav-link" th:href="@{/product/create}">Create</a>
+    </div>
+  </div>
+</nav>
+
+<main class="container app-container">
+  <div class="hero card p-4 p-md-5">
+    <p class="text-uppercase small mb-2">Simple inventory</p>
+    <h1>Keep your products organized.</h1>
+    <h3>Welcome</h3>
+    <p class="lead mt-3">Track products, update quantities, and stay organized with a clean workflow.</p>
+    <div class="hero-actions mt-4">
+      <a class="btn btn-light" th:href="@{/product/list}">View Products</a>
+      <a class="btn btn-outline-light" th:href="@{/product/create}">Create Product</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container d-flex justify-content-between align-items-center flex-wrap">
+    <span>ADV Shop - simple product management.</span>
+    <a th:href="@{/product/list}">Go to list</a>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
 </html>

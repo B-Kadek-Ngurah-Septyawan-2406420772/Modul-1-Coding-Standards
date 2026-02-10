@@ -4,25 +4,51 @@
   <meta charset="UTF-8">
   <title>Edit Product</title>
   <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERd`knLPMO" crossorigin="anonymous">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
 <body>
-
-<div class="container">
-  <h3>Edit Product</h3>
-
-  <form th:action="@{/product/edit}" th:object="${product}" method="post">
-    <input th:field="*{productId}" type="hidden">
-    <div class="form-group">
-      <label for="nameInput">Name</label>
-      <input th:field="*{productName}" type="text" class="form-control mb-4 col-4" id="nameInput" placeholder="Enter product' name">
+<nav class="navbar navbar-expand-lg navbar-dark app-navbar">
+  <div class="container">
+    <a class="navbar-brand" th:href="@{/}">ADV Shop</a>
+    <div class="navbar-nav ml-auto">
+      <a class="nav-link" th:href="@{/}">Home</a>
+      <a class="nav-link" th:href="@{/product/list}">Products</a>
+      <a class="nav-link" th:href="@{/product/create}">Create</a>
     </div>
-    <div class="form-group">
-      <label for="quantityInput">Quantity</label>
-      <input th:field="*{productQuantity}" type="text" class="form-control mb-4 col-4" id="quantityInput" placeholder="Enter product' name">
-    </div>
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
-</div>
+  </div>
+</nav>
+
+<main class="container app-container">
+  <div class="page-header mb-4">
+    <h2 class="page-title">Edit Product</h2>
+    <p class="page-subtitle">Update the details of your product.</p>
+  </div>
+
+  <div class="card p-4">
+    <form th:action="@{/product/edit}" th:object="${product}" method="post">
+      <input th:field="*{productId}" type="hidden">
+      <div class="form-group">
+        <label for="nameInput">Name</label>
+        <input th:field="*{productName}" type="text" class="form-control mb-4" id="nameInput" placeholder="Enter product name">
+      </div>
+      <div class="form-group">
+        <label for="quantityInput">Quantity</label>
+        <input th:field="*{productQuantity}" type="text" class="form-control mb-4" id="quantityInput" placeholder="Enter product quantity">
+      </div>
+      <div class="d-flex align-items-center flex-wrap">
+        <button type="submit" class="btn btn-primary">Update Product</button>
+        <a th:href="@{/product/list}" class="btn btn-link ml-2">Back to list</a>
+      </div>
+    </form>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container d-flex justify-content-between align-items-center flex-wrap">
+    <span>ADV Shop - simple product management.</span>
+    <a th:href="@{/product/list}">Go to list</a>
+  </div>
+</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
 </body>
