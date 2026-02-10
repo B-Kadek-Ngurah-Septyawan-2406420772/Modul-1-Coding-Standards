@@ -29,11 +29,15 @@
       <input th:field="*{productId}" type="hidden">
       <div class="form-group">
         <label for="nameInput">Name</label>
-        <input th:field="*{productName}" type="text" class="form-control mb-4" id="nameInput" placeholder="Enter product name">
+        <input th:field="*{productName}" type="text" class="form-control mb-2" id="nameInput" placeholder="Enter product name"
+               th:classappend="${#fields.hasErrors('productName')} ? 'is-invalid'">
+        <div th:if="${#fields.hasErrors('productName')}" class="text-danger small" th:errors="*{productName}"></div>
       </div>
       <div class="form-group">
         <label for="quantityInput">Quantity</label>
-        <input th:field="*{productQuantity}" type="text" class="form-control mb-4" id="quantityInput" placeholder="Enter product quantity">
+        <input th:field="*{productQuantity}" type="text" class="form-control mb-2" id="quantityInput" placeholder="Enter product quantity"
+               th:classappend="${#fields.hasErrors('productQuantity')} ? 'is-invalid'">
+        <div th:if="${#fields.hasErrors('productQuantity')}" class="text-danger small" th:errors="*{productQuantity}"></div>
       </div>
       <div class="d-flex align-items-center flex-wrap">
         <button type="submit" class="btn btn-primary">Update Product</button>

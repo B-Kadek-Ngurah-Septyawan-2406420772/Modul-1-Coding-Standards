@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindingResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 class ProductControllerTest {
@@ -52,8 +54,11 @@ class ProductControllerTest {
     void testEditProductPostMissingProduct() {
         Product updatedProduct = new Product();
         updatedProduct.setProductId("missing-product");
+        updatedProduct.setProductName("Product Name");
+        updatedProduct.setProductQuantity(10);
+        BindingResult bindingResult = new BeanPropertyBindingResult(updatedProduct, "product");
 
-        String viewName = this.productController.editProductPost(updatedProduct, new ExtendedModelMap());
+        String viewName = this.productController.editProductPost(updatedProduct, bindingResult, new ExtendedModelMap());
 
         assertEquals("redirect:list", viewName);
     }
