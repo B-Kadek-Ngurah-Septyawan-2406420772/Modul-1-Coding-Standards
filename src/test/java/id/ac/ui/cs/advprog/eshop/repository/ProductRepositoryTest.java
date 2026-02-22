@@ -65,4 +65,11 @@ class ProductRepositoryTest {
 
         assertNull(result);
     }
+
+    @Test
+    void testFindByIdNullProductId() {
+        Product result = this.productRepository.findById(null);
+
+        assertNull(result);
+    }
 }

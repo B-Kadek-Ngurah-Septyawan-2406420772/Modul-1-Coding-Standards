@@ -19,6 +19,31 @@ class ProductServiceImplTest {
     }
 
     @Test
+    void testCreateProductWithNullIdGeneratesId() {
+        Product product = new Product();
+        product.setProductName("Product Name");
+        product.setProductQuantity(10);
+
+        Product result = this.productService.create(product);
+
+        assertNotNull(result.getProductId());
+        assertFalse(result.getProductId().isBlank());
+    }
+
+    @Test
+    void testCreateProductWithBlankIdGeneratesId() {
+        Product product = new Product();
+        product.setProductId(" ");
+        product.setProductName("Product Name");
+        product.setProductQuantity(10);
+
+        Product result = this.productService.create(product);
+
+        assertNotNull(result.getProductId());
+        assertFalse(result.getProductId().isBlank());
+    }
+
+    @Test
     void testUpdateExistingProduct() {
         Product product = new Product();
         product.setProductId("product-1");
