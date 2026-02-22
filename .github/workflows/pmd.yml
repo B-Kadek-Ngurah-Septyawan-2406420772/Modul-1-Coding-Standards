@@ -1,0 +1,40 @@
+name: PMD Code Quality
+
+on:
+  push:
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  pmd:
+    name: Run PMD
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out the Git repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java toolchain
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+
+      - name: Run PMD analysis
+        id: pmd
+        uses: pmd/pmd-github-action@v2
+        with:
+          version: "7.0.0-rc4"
+          sourcePath: "src/main/java"
+          rulesets: "rulesets/java/quickstart.xml"
+          analyzeModifiedFilesOnly: false
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: pmd-report.sarif
+
+      - name: Show violations count
+        run: |
+          echo "PMD violations: ${{ steps.pmd.outputs.violations }}"
