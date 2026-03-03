@@ -2,10 +2,12 @@ package id.ac.ui.cs.advprog.eshop.controller;
 
 import id.ac.ui.cs.advprog.eshop.model.Product;
 import id.ac.ui.cs.advprog.eshop.repository.ProductRepository;
+import id.ac.ui.cs.advprog.eshop.service.ExistingProductIdGenerationStrategy;
+import id.ac.ui.cs.advprog.eshop.service.MissingProductIdGenerationStrategy;
+import id.ac.ui.cs.advprog.eshop.service.ProductIdAssigner;
 import id.ac.ui.cs.advprog.eshop.service.ProductServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -22,10 +24,12 @@ class ProductControllerTest {
     @BeforeEach
     void setUp() {
         ProductRepository productRepository = new ProductRepository();
-        this.productService = new ProductServiceImpl();
-        ReflectionTestUtils.setField(this.productService, "productRepository", productRepository);
-        this.productController = new ProductController();
-        ReflectionTestUtils.setField(this.productController, "service", this.productService);
+        ProductIdAssigner productIdAssigner = new ProductIdAssigner(List.of(
+                new MissingProductIdGenerationStrategy(),
+                new ExistingProductIdGenerationStrategy()
+        ));
+        this.productService = new ProductServiceImpl(productRepository, productRepository, productIdAssigner);
+        this.productController = new ProductController(this.productService, this.productService);
     }
 
     @Test
@@ -49,7 +53,7 @@ class ProductControllerTest {
 
         assertEquals("redirect:list", viewName);
         assertEquals(1, this.productService.findAll().size());
-        assertNotNull(this.productService.findAll().get(0).getProductId());
+        assertNotNull(this.productService.findAll().getFirst().getProductId());
     }
 
     @Test

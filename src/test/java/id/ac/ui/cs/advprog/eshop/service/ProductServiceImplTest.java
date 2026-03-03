@@ -4,7 +4,8 @@ import id.ac.ui.cs.advprog.eshop.model.Product;
 import id.ac.ui.cs.advprog.eshop.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 class ProductServiceImplTest {
@@ -14,8 +15,11 @@ class ProductServiceImplTest {
     @BeforeEach
     void setUp() {
         ProductRepository productRepository = new ProductRepository();
-        this.productService = new ProductServiceImpl();
-        ReflectionTestUtils.setField(this.productService, "productRepository", productRepository);
+        ProductIdAssigner productIdAssigner = new ProductIdAssigner(List.of(
+                new MissingProductIdGenerationStrategy(),
+                new ExistingProductIdGenerationStrategy()
+        ));
+        this.productService = new ProductServiceImpl(productRepository, productRepository, productIdAssigner);
     }
 
     @Test
@@ -96,5 +100,37 @@ class ProductServiceImplTest {
         Product result = this.productService.delete("missing-product");
 
         assertNull(result);
+    }
+
+    @Test
+    void testCreateProductCanUseAdditionalIdStrategyWithoutChangingServiceCode() {
+        ProductIdGenerationStrategy legacyStrategy = new ProductIdGenerationStrategy() {
+            @Override
+            public boolean supports(Product product) {
+                return product.getProductName() != null && product.getProductName().startsWith("LEGACY-");
+            }
+
+            @Override
+            public String generate(Product product) {
+                return "legacy-fixed-id";
+            }
+        };
+
+        ProductRepository productRepository = new ProductRepository();
+        ProductIdAssigner productIdAssigner = new ProductIdAssigner(List.of(
+                legacyStrategy,
+                new MissingProductIdGenerationStrategy(),
+                new ExistingProductIdGenerationStrategy()
+        ));
+        ProductServiceImpl customizableProductService =
+                new ProductServiceImpl(productRepository, productRepository, productIdAssigner);
+
+        Product product = new Product();
+        product.setProductName("LEGACY-Console");
+        product.setProductQuantity(3);
+
+        Product result = customizableProductService.create(product);
+
+        assertEquals("legacy-fixed-id", result.getProductId());
     }
 }

@@ -8,18 +8,21 @@ import java.util.Iterator;
 import java.util.List;
 
 @Repository
-public class ProductRepository {
-    private List<Product> productData = new ArrayList<>();
+public class ProductRepository implements ProductReadRepository, ProductWriteRepository {
+    private final List<Product> productData = new ArrayList<>();
 
+    @Override
     public Product create(Product product) {
         productData.add(product);
         return product;
     }
 
+    @Override
     public Iterator<Product> findAll() {
         return productData.iterator();
     }
 
+    @Override
     public Product findById(String productId) {
         if (productId == null) {
             return null;
@@ -32,6 +35,7 @@ public class ProductRepository {
         return null;
     }
 
+    @Override
     public Product update(Product product) {
         Product productToUpdate = findById(product.getProductId());
         if (productToUpdate == null) {
@@ -42,6 +46,7 @@ public class ProductRepository {
         return productToUpdate;
     }
 
+    @Override
     public Product delete(String productId) {
         Product productToDelete = findById(productId);
         if (productToDelete == null) {
