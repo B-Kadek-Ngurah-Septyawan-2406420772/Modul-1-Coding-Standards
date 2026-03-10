@@ -12,14 +12,13 @@ public class PaymentRepository {
     private final List<Payment> paymentData = new ArrayList<>();
 
     public Payment save(Payment payment) {
-        int i = 0;
-        for (Payment savedPayment : paymentData) {
+        for (int i = 0; i < paymentData.size(); i++) {
+            Payment savedPayment = paymentData.get(i);
             if (savedPayment.getId().equals(payment.getId())) {
                 paymentData.remove(i);
                 paymentData.add(i, payment);
                 return payment;
             }
-            i += 1;
         }
 
         paymentData.add(payment);
@@ -27,6 +26,10 @@ public class PaymentRepository {
     }
 
     public Payment findById(String id) {
+        if (id == null) {
+            return null;
+        }
+
         for (Payment savedPayment : paymentData) {
             if (savedPayment.getId().equals(id)) {
                 return savedPayment;
