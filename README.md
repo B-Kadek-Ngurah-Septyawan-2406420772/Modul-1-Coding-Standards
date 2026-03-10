@@ -115,3 +115,35 @@ Menurut saya, implementasi saat ini **sudah memenuhi definisi Continuous Integra
 - **Desain inheritance bisa sesat (kalo ga nerapin LSP):** `CarController extends ProductController` bisa bikin perubahan di product ikut ngaruh ke car secara ga terduga.
 - **Ketergantungan jadi terlalu besar (kalo ga nerapin ISP):** Kalo semua fungsi dicampur dlm satu interface yg besar, bagian yg cuma butuh baca data tetep “terpaksa” bergantung pada fungsi ubah/hapus.
 - **Testing bakalan lebih susah dan susah di-develop (tanpa DIP):** Kalo service bergantung langsung pada repository tertentu dan pemasangan dependency-nya ga jelas, testing bakalan jadi jauh lebih ribet, dan pergantian implementasi penyimpanan bisa maksa perubahan di banyak tempat.
+
+# Modul 4 – Refactoring and TDD
+
+## Refleksi
+
+### 1 Apakah TDD berguna?
+Menurut saya, alur TDD yang saya lakukan pada latihan ini cukup berguna. Dengan menulis test lebih dulu, saya jadi dipaksa untuk memikirkan perilaku yang diharapkan dari class `Order`, `OrderRepository`, dan `OrderService` sebelum menulis implementasinya. Alur ini juga membantu saya bekerja secara bertahap: mulai dari membuat test gagal, lalu menulis kode minimum agar test lolos, kemudian melakukan perapihan seperti penggunaan `OrderStatus` agar kode menjadi lebih rapi dan aman.
+
+Saya juga merasa TDD membantu meningkatkan kepercayaan diri saat melakukan perubahan. Ketika implementasi repository dan service berkembang, saya bisa segera mengetahui apakah perubahan tersebut merusak perilaku yang sebelumnya sudah benar. Dalam konteks ini, test berfungsi sebagai safety net dan sekaligus dokumentasi perilaku sistem.
+
+Walaupun begitu, saya merasa proses TDD saya masih bisa ditingkatkan. Pada beberapa bagian, saya masih cenderung fokus agar test “lolos” terlebih dahulu, bukan langsung memikirkan desain test yang paling bersih dan mudah dirawat. Untuk pengerjaan berikutnya, saya perlu:
+- menambahkan lebih banyak edge case dan negative case sejak awal,
+- mengurangi duplikasi data uji dengan helper method atau factory method,
+- memastikan setiap test benar-benar menguji satu perilaku spesifik,
+- dan melakukan refactor tidak hanya pada production code, tetapi juga pada test code agar tetap bersih dan mudah dibaca.
+
+Secara keseluruhan, TDD cukup berguna bagi saya karena membuat proses pengembangan lebih terarah, lebih aman saat refactor, dan membantu saya memahami requirement melalui test.
+
+### 2 Apakah unit test-nya sudah mengikuti prinsip F.I.R.S.T?
+Menurut saya, unit test yang saya buat sudah cukup mengikuti prinsip F.I.R.S.T., walaupun masih ada beberapa hal yang bisa diperbaiki.
+
+**Fast**: Ya, karena test yang dibuat merupakan unit test sederhana, menggunakan in-memory data structure seperti `ArrayList`, serta mock pada repository. Test tidak bergantung pada database, jaringan, atau proses eksternal, sehingga berjalan cepat.
+
+**Independent**: Sebagian besar iya, karena setiap test menggunakan `@BeforeEach` untuk membuat ulang data dan object yang dibutuhkan. Namun, saya masih menggunakan fixture bersama seperti `orders.get(1)` di banyak test. Ini memang masih aman, tetapi membuat test agak bergantung pada susunan data di setup. Ke depannya saya perlu membuat data uji yang lebih eksplisit di masing-masing test atau memakai helper method agar test lebih mandiri dan tidak bergantung pada indeks tertentu.
+
+**Repeatable**: Ya, karena hasil test seharusnya selalu sama setiap dijalankan. Data input bersifat statis, tidak bergantung pada waktu sistem, network, maupun environment eksternal.
+
+**Self-Validating**: Ya, karena test menggunakan assertion seperti `assertEquals`, `assertNull`, `assertTrue`, dan `assertThrows`, sehingga hasil test langsung jelas: pass atau fail. Tidak perlu pengecekan manual.
+
+**Timely**: Ya, karena dari proses yang saya lakukan, test ditulis lebih dulu sebelum implementasi dilengkapi. Ini sesuai dengan semangat TDD, yaitu menjadikan test sebagai pendorong desain dan implementasi.
+
+Jadi, saya menilai test yang saya buat sudah cukup mengikuti prinsip F.I.R.S.T., tetapi masih bisa diperbaiki terutama pada aspek **Independent**. Untuk pengerjaan berikutnya, saya ingin membuat test data yang lebih terisolasi, mengurangi ketergantungan pada shared fixture, dan menulis test yang lebih ringkas namun tetap jelas.
