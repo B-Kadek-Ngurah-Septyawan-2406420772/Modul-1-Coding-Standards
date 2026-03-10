@@ -130,4 +130,52 @@ class PaymentServiceTest {
         List<Payment> results = paymentService.getAllPayments();
         assertEquals(2, results.size());
     }
+
+    @Test
+    void testAddPaymentWithValidVoucherCodeSetsSuccessStatus() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("voucherCode", "ESHOP1234ABC5678");
+
+        when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Payment result = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
+
+        assertEquals(Payment.STATUS_SUCCESS, result.getStatus());
+    }
+
+    @Test
+    void testAddPaymentWithVoucherCodeInvalidLengthSetsRejectedStatus() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("voucherCode", "ESHOP1234");
+
+        when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Payment result = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
+
+        assertEquals(Payment.STATUS_REJECTED, result.getStatus());
+    }
+
+    @Test
+    void testAddPaymentWithVoucherCodeInvalidPrefixSetsRejectedStatus() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("voucherCode", "SHOPX1234ABC5678");
+
+        when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Payment result = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
+
+        assertEquals(Payment.STATUS_REJECTED, result.getStatus());
+    }
+
+    @Test
+    void testAddPaymentWithVoucherCodeWithoutEightDigitsSetsRejectedStatus() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("voucherCode", "ESHOPABCDABCDWXYZ");
+
+        when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Payment result = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
+
+        assertEquals(Payment.STATUS_REJECTED, result.getStatus());
+    }
 }
