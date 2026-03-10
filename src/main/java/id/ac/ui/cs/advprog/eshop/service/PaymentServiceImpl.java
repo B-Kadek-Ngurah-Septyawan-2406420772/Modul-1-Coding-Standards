@@ -14,7 +14,10 @@ import java.util.UUID;
 public class PaymentServiceImpl implements PaymentService {
 
     private static final String VOUCHER_CODE_METHOD = "VOUCHER_CODE";
+    private static final String BANK_TRANSFER_METHOD = "BANK_TRANSFER";
     private static final String VOUCHER_CODE_KEY = "voucherCode";
+    private static final String BANK_NAME_KEY = "bankName";
+    private static final String REFERENCE_CODE_KEY = "referenceCode";
     private static final String VOUCHER_PREFIX = "ESHOP";
     private static final int VOUCHER_LENGTH = 16;
     private static final int VOUCHER_REQUIRED_DIGIT_COUNT = 8;
@@ -33,6 +36,12 @@ public class PaymentServiceImpl implements PaymentService {
             if (isValidVoucherCode(voucherCode)) {
                 payment.setStatus(Payment.STATUS_SUCCESS);
             } else {
+                payment.setStatus(Payment.STATUS_REJECTED);
+            }
+        } else if (BANK_TRANSFER_METHOD.equals(method)) {
+            String bankName = payment.getPaymentData().get(BANK_NAME_KEY);
+            String referenceCode = payment.getPaymentData().get(REFERENCE_CODE_KEY);
+            if (!hasText(bankName) || !hasText(referenceCode)) {
                 payment.setStatus(Payment.STATUS_REJECTED);
             }
         }
@@ -72,6 +81,10 @@ public class PaymentServiceImpl implements PaymentService {
             }
         }
         return digitCount;
+    }
+
+    private boolean hasText(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     @Override
