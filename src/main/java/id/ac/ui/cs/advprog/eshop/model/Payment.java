@@ -8,6 +8,10 @@ import java.util.Map;
 @Getter
 public class Payment {
 
+    public static final String STATUS_PENDING = "PENDING";
+    public static final String STATUS_SUCCESS = "SUCCESS";
+    public static final String STATUS_REJECTED = "REJECTED";
+
     private final String id;
     private final Order order;
     private final String method;
@@ -19,7 +23,7 @@ public class Payment {
         this.order = order;
         this.method = method;
         this.paymentData = paymentData == null ? new HashMap<>() : new HashMap<>(paymentData);
-        this.status = "PENDING";
+        this.status = STATUS_PENDING;
     }
 
     public void setStatus(String status) {
