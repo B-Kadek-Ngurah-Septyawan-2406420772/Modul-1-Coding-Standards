@@ -14,6 +14,10 @@ import java.util.UUID;
 public class PaymentServiceImpl implements PaymentService {
 
     private static final String VOUCHER_CODE_METHOD = "VOUCHER_CODE";
+    private static final String VOUCHER_CODE_KEY = "voucherCode";
+    private static final String VOUCHER_PREFIX = "ESHOP";
+    private static final int VOUCHER_LENGTH = 16;
+    private static final int VOUCHER_REQUIRED_DIGIT_COUNT = 8;
 
     private final PaymentRepository paymentRepository;
 
@@ -25,7 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment addPayment(Order order, String method, Map<String, String> paymentData) {
         Payment payment = new Payment(UUID.randomUUID().toString(), order, method, paymentData);
         if (VOUCHER_CODE_METHOD.equals(method)) {
-            String voucherCode = payment.getPaymentData().get("voucherCode");
+            String voucherCode = payment.getPaymentData().get(VOUCHER_CODE_KEY);
             if (isValidVoucherCode(voucherCode)) {
                 payment.setStatus(Payment.STATUS_SUCCESS);
             } else {
@@ -51,20 +55,23 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private boolean isValidVoucherCode(String voucherCode) {
-        if (voucherCode == null || voucherCode.length() != 16) {
+        if (voucherCode == null || voucherCode.length() != VOUCHER_LENGTH) {
             return false;
         }
-        if (!voucherCode.startsWith("ESHOP")) {
+        if (!voucherCode.startsWith(VOUCHER_PREFIX)) {
             return false;
         }
+        return countDigits(voucherCode) == VOUCHER_REQUIRED_DIGIT_COUNT;
+    }
 
+    private int countDigits(String value) {
         int digitCount = 0;
-        for (int i = 0; i < voucherCode.length(); i++) {
-            if (Character.isDigit(voucherCode.charAt(i))) {
+        for (int i = 0; i < value.length(); i++) {
+            if (Character.isDigit(value.charAt(i))) {
                 digitCount += 1;
             }
         }
-        return digitCount == 8;
+        return digitCount;
     }
 
     @Override
