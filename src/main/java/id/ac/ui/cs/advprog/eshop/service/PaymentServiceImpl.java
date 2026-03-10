@@ -13,6 +13,8 @@ import java.util.UUID;
 @Service
 public class PaymentServiceImpl implements PaymentService {
 
+    private static final String VOUCHER_CODE_METHOD = "VOUCHER_CODE";
+
     private final PaymentRepository paymentRepository;
 
     public PaymentServiceImpl(PaymentRepository paymentRepository) {
@@ -22,6 +24,14 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Payment addPayment(Order order, String method, Map<String, String> paymentData) {
         Payment payment = new Payment(UUID.randomUUID().toString(), order, method, paymentData);
+        if (VOUCHER_CODE_METHOD.equals(method)) {
+            String voucherCode = payment.getPaymentData().get("voucherCode");
+            if (isValidVoucherCode(voucherCode)) {
+                payment.setStatus(Payment.STATUS_SUCCESS);
+            } else {
+                payment.setStatus(Payment.STATUS_REJECTED);
+            }
+        }
         return paymentRepository.save(payment);
     }
 
@@ -38,6 +48,23 @@ public class PaymentServiceImpl implements PaymentService {
         } else if (Payment.STATUS_REJECTED.equals(status)) {
             payment.getOrder().setStatus(OrderStatus.FAILED.getValue());
         }
+    }
+
+    private boolean isValidVoucherCode(String voucherCode) {
+        if (voucherCode == null || voucherCode.length() != 16) {
+            return false;
+        }
+        if (!voucherCode.startsWith("ESHOP")) {
+            return false;
+        }
+
+        int digitCount = 0;
+        for (int i = 0; i < voucherCode.length(); i++) {
+            if (Character.isDigit(voucherCode.charAt(i))) {
+                digitCount += 1;
+            }
+        }
+        return digitCount == 8;
     }
 
     @Override
