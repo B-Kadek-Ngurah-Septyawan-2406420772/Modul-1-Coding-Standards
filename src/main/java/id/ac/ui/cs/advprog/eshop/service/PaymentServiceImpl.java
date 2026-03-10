@@ -59,6 +59,8 @@ public class PaymentServiceImpl implements PaymentService {
         String referenceCode = payment.getPaymentData().get(REFERENCE_CODE_KEY);
         if (!hasText(bankName) || !hasText(referenceCode)) {
             payment.setStatus(Payment.STATUS_REJECTED);
+        } else {
+            payment.setStatus(Payment.STATUS_PENDING);
         }
     }
 
