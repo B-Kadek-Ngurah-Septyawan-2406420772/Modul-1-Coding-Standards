@@ -31,21 +31,35 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Payment addPayment(Order order, String method, Map<String, String> paymentData) {
         Payment payment = new Payment(UUID.randomUUID().toString(), order, method, paymentData);
-        if (VOUCHER_CODE_METHOD.equals(method)) {
-            String voucherCode = payment.getPaymentData().get(VOUCHER_CODE_KEY);
-            if (isValidVoucherCode(voucherCode)) {
-                payment.setStatus(Payment.STATUS_SUCCESS);
-            } else {
-                payment.setStatus(Payment.STATUS_REJECTED);
-            }
-        } else if (BANK_TRANSFER_METHOD.equals(method)) {
-            String bankName = payment.getPaymentData().get(BANK_NAME_KEY);
-            String referenceCode = payment.getPaymentData().get(REFERENCE_CODE_KEY);
-            if (!hasText(bankName) || !hasText(referenceCode)) {
-                payment.setStatus(Payment.STATUS_REJECTED);
-            }
-        }
+        applyInitialStatus(payment);
         return paymentRepository.save(payment);
+    }
+
+    private void applyInitialStatus(Payment payment) {
+        if (VOUCHER_CODE_METHOD.equals(payment.getMethod())) {
+            setVoucherCodeStatus(payment);
+            return;
+        }
+        if (BANK_TRANSFER_METHOD.equals(payment.getMethod())) {
+            setBankTransferStatus(payment);
+        }
+    }
+
+    private void setVoucherCodeStatus(Payment payment) {
+        String voucherCode = payment.getPaymentData().get(VOUCHER_CODE_KEY);
+        if (isValidVoucherCode(voucherCode)) {
+            payment.setStatus(Payment.STATUS_SUCCESS);
+        } else {
+            payment.setStatus(Payment.STATUS_REJECTED);
+        }
+    }
+
+    private void setBankTransferStatus(Payment payment) {
+        String bankName = payment.getPaymentData().get(BANK_NAME_KEY);
+        String referenceCode = payment.getPaymentData().get(REFERENCE_CODE_KEY);
+        if (!hasText(bankName) || !hasText(referenceCode)) {
+            payment.setStatus(Payment.STATUS_REJECTED);
+        }
     }
 
     @Override
