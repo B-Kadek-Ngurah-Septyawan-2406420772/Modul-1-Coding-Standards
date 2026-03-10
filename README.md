@@ -147,3 +147,37 @@ Menurut saya, unit test yang saya buat sudah cukup mengikuti prinsip F.I.R.S.T.,
 **Timely**: Ya, karena dari proses yang saya lakukan, test ditulis lebih dulu sebelum implementasi dilengkapi. Ini sesuai dengan semangat TDD, yaitu menjadikan test sebagai pendorong desain dan implementasi.
 
 Jadi, saya menilai test yang saya buat sudah cukup mengikuti prinsip F.I.R.S.T., tetapi masih bisa diperbaiki terutama pada aspek **Independent**. Untuk pengerjaan berikutnya, saya ingin membuat test data yang lebih terisolasi, mengurangi ketergantungan pada shared fixture, dan menulis test yang lebih ringkas namun tetap jelas.
+
+## Refleksi Bonus
+
+### 1. Pendapat Saya Mengenai Kode Teman Saya
+Menurut saya, kode teman saya secara umum sudah cukup baik karena fitur `Order` dan `Payment` berhasil diimplementasikan dan alur utamanya sudah berjalan. Struktur project juga sudah mengikuti pemisahan model, repository, dan service sehingga secara dasar cukup mudah dipahami. Selain itu, partner saya juga sudah menambahkan test sehingga perilaku utama sistem masih dapat diverifikasi.
+
+Namun, masih ada beberapa aspek yang menurut saya kurang, terutama dari sisi maintainability. Beberapa class masih memiliki tanggung jawab yang terlalu besar, ada logic yang seharusnya berada di layer lain tetapi ditempatkan di repository, dan ada beberapa bagian yang masih melakukan duplikasi atau rekonstruksi object secara tidak perlu. Selain itu, saya juga menemukan inkonsistensi kecil pada representasi status yang berpotensi menimbulkan bug atau kebingungan ketika kode dikembangkan lebih lanjut. Jadi, walaupun fitur berjalan, desain kodenya masih bisa diperbaiki agar lebih stabil dan lebih mudah dirawat.
+
+### 2. Kontribusi Saya pada Kode Teman Saya
+Kontribusi saya dimulai dengan melakukan review terhadap pull request teman saya. Saya membaca perubahan kodenya, mengidentifikasi bagian-bagian yang berpotensi menjadi code smell, lalu menuliskan komentar review yang menjelaskan masalah maintainability dan saran refactor yang relevan.
+
+Setelah itu, saya membuat branch refactor khusus sesuai instruksi Bonus 2, lalu melakukan refactor pada bagian-bagian yang saya nilai bermasalah. Saya juga memastikan bahwa refactor tersebut tidak mengubah behavior utama aplikasi. Setelah perubahan selesai, saya menjalankan pengujian untuk memastikan fitur `Order`, `Payment`, dan fitur lain yang sudah ada tetap berjalan dengan benar. Dengan begitu, kontribusi saya bukan hanya memberi masukan, tetapi juga benar-benar memperbaiki kualitas kode partner saya secara langsung.
+
+### 3. Code Smells pada Kode Teman Saya
+Saya menemukan beberapa code smell pada kode teman saya.
+
+Pertama, pada `PaymentRepository`, repository tidak hanya bertugas menyimpan data, tetapi juga membuat ulang object `Payment` ketika `id` masih `null`. Ini merupakan pelanggaran terhadap prinsip single responsibility karena repository seharusnya fokus pada persistence, bukan object creation.
+
+Kedua, pada `OrderServiceImpl`, method `updateStatus` membuat object `Order` baru hanya untuk mengganti nilai `status`. Ini merupakan duplication smell dan membuat kode menjadi rapuh, karena seluruh field order lama harus disalin ulang meskipun yang berubah hanya satu atribut.
+
+Ketiga, pada `OrderStatus`, enum memiliki dua representasi status, yaitu `value` dan `name()`, tetapi validasi `contains()` menggunakan `name()`. Hal ini menimbulkan inkonsistensi representasi data dan berpotensi membingungkan ketika kode dikembangkan lebih lanjut.
+
+### 4. Refactoring Steps yang Saya Sarankan dan Execute pada Kode Teman Saya
+Untuk mengatasi code smell pada `PaymentRepository`, saya menyarankan agar proses pembuatan `id` dipindahkan keluar dari repository, misalnya ke service, sehingga repository hanya bertugas menyimpan, memperbarui, dan mengambil data. Refactor ini saya lakukan agar responsibility repository menjadi lebih jelas dan state `Payment` yang sudah dihitung sebelumnya tidak tertimpa secara tidak sengaja.
+
+Untuk `OrderServiceImpl`, saya menyarankan agar update status dilakukan langsung pada object `Order` yang sudah ada dengan memanggil `setStatus(status)`, lalu object yang sama disimpan kembali ke repository. Saya menjalankan refactor ini agar tidak ada lagi pembuatan object baru hanya untuk mengganti satu field, sehingga kode menjadi lebih sederhana dan lebih mudah dipelihara.
+
+Untuk `OrderStatus`, saya menyarankan agar representasi status dibuat konsisten dengan satu sumber kebenaran. Jika field `value` tetap digunakan, maka validasi juga harus menggunakan `value`, bukan `name()`. Refactor ini saya lakukan agar validasi status lebih konsisten dan tidak menimbulkan potensi mismatch di masa depan.
+
+Selain melakukan refactor, saya juga memastikan bahwa test tetap berjalan setelah perubahan dilakukan, sehingga refactor tersebut memperbaiki kualitas desain tanpa merusak fitur yang sudah ada.
+
+### Link Comment dan Link PR
+- Comment: https://github.com/B-Yafi-Alifuddin-2406437155/Module-01-Coding-Standards/pull/11#issuecomment-4031033202
+- PR dari branch refactor/2406420772 ke branch order: https://github.com/B-Yafi-Alifuddin-2406437155/Module-01-Coding-Standards/pull/12
