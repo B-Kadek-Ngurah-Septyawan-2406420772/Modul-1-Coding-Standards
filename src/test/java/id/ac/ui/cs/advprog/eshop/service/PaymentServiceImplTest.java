@@ -100,6 +100,22 @@ class PaymentServiceTest {
     }
 
     @Test
+    void testSetStatusToPendingDoesNotChangeOrderStatus() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("bankName", "BCA");
+        paymentData.put("referenceCode", "INV-001");
+
+        Payment payment = new Payment("payment-1", order, "BANK_TRANSFER", paymentData);
+        doReturn(payment).when(paymentRepository).save(payment);
+
+        Payment result = paymentService.setStatus(payment, Payment.STATUS_PENDING);
+
+        assertEquals(Payment.STATUS_PENDING, result.getStatus());
+        assertEquals(OrderStatus.WAITING_PAYMENT.getValue(), result.getOrder().getStatus());
+        verify(paymentRepository, times(1)).save(payment);
+    }
+
+    @Test
     void testGetPayment() {
         Map<String, String> paymentData = new HashMap<>();
         paymentData.put("voucherCode", "ESHOP1234ABC5678");
@@ -156,6 +172,18 @@ class PaymentServiceTest {
     }
 
     @Test
+    void testAddPaymentWithNullVoucherCodeSetsRejectedStatus() {
+        Map<String, String> paymentData = new HashMap<>();
+        paymentData.put("voucherCode", null);
+
+        when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Payment result = paymentService.addPayment(order, "VOUCHER_CODE", paymentData);
+
+        assertEquals(Payment.STATUS_REJECTED, result.getStatus());
+    }
+
+    @Test
     void testAddPaymentWithVoucherCodeInvalidPrefixSetsRejectedStatus() {
         Map<String, String> paymentData = new HashMap<>();
         paymentData.put("voucherCode", "SHOPX1234ABC5678");
@@ -170,7 +198,7 @@ class PaymentServiceTest {
     @Test
     void testAddPaymentWithVoucherCodeWithoutEightDigitsSetsRejectedStatus() {
         Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("voucherCode", "ESHOPABCDABCDWXYZ");
+        paymentData.put("voucherCode", "ESHOP1234ABCD567");
 
         when(paymentRepository.save(any(Payment.class))).thenAnswer(invocation -> invocation.getArgument(0));
 

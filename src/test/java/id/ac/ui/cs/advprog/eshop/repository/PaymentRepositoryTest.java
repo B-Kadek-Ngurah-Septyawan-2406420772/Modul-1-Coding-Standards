@@ -99,6 +99,12 @@ class PaymentRepositoryTest {
     }
 
     @Test
+    void testFindByIdIfIdIsNull() {
+        Payment findResult = paymentRepository.findById(null);
+        assertNull(findResult);
+    }
+
+    @Test
     void testFindAllReturnsAllPayments() {
         for (Payment payment : payments) {
             paymentRepository.save(payment);
